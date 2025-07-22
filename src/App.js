@@ -79,6 +79,9 @@ function App() {
         <h4 style={{ textTransform: "uppercase", color: "#888", fontSize: "0.875rem" }}>
           Get ready to evaluate your resume
         </h4>
+        <h4 style={{ textTransform: "uppercase", color: "#888", fontSize: "0.675rem" }}>
+          This Is Gonna Hurt
+        </h4>
         <h1 style={{ fontSize: "3rem", fontWeight: "900", margin: "1rem 0" }}>
           Upload. Roast. Improve. Repeat.
         </h1>
@@ -202,7 +205,7 @@ function App() {
           paddingTop: "4rem",
         }}
       >
-        Developed by <strong>Ashwany</strong> • Roast My Resume Project
+        Developed by <strong>Ashwany</strong> 
       </footer>
     </div>
   );
