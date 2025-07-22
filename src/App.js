@@ -186,7 +186,7 @@ function App() {
           fontSize: "0.85rem",
         }}
       >
-        Developed by <strong>Ashwany</strong> • Took a lot of Sarcasm & Caffeine☕
+        Developed by <strong>Ashwany Kumar Sharma</strong> • Took a lot of Sarcasm & Caffeine☕
       </footer>
 
       {/* Roast Modal */}
