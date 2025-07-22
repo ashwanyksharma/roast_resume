@@ -1,5 +1,4 @@
-// src/App.js
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { supabase } from "./Supabase.js";
 import UploadZone from "./components/UploadZone.js";
 
@@ -8,10 +7,51 @@ function App() {
   const [roast, setRoast] = useState(null);
   const [loading, setLoading] = useState(false);
   const [showModal, setShowModal] = useState(false);
+  const [typedText, setTypedText] = useState("");
+  const [typingFinished, setTypingFinished] = useState(false);
+
+  const words = ["Upload.", "Roast.", "Improve.", "Repeat."];
+  const wordIndex = useRef(0);
+  const charIndex = useRef(0);
+  const isDeleting = useRef(false);
+
+  useEffect(() => {
+    let timeout;
+
+    const type = () => {
+      if (wordIndex.current >= words.length) {
+        setTypedText("Upload. Roast. Improve. Repeat.");
+        setTypingFinished(true);
+        return;
+      }
+
+      const currentWord = words[wordIndex.current];
+      const updatedText = isDeleting.current
+        ? currentWord.substring(0, charIndex.current - 1)
+        : currentWord.substring(0, charIndex.current + 1);
+
+      setTypedText(updatedText);
+
+      if (!isDeleting.current && updatedText === currentWord) {
+        isDeleting.current = true;
+        timeout = setTimeout(type, 500);
+      } else if (isDeleting.current && updatedText === "") {
+        isDeleting.current = false;
+        wordIndex.current++;
+        charIndex.current = 0;
+        timeout = setTimeout(type, 200);
+      } else {
+        charIndex.current += isDeleting.current ? -1 : 1;
+        timeout = setTimeout(type, isDeleting.current ? 20 : 45);
+      }
+    };
+
+    type();
+    return () => clearTimeout(timeout);
+  }, []);
 
   useEffect(() => {
     if (!uploadId) return;
-
     setLoading(true);
 
     supabase
@@ -23,7 +63,7 @@ function App() {
         if (data) {
           setRoast(data);
           setLoading(false);
-          setShowModal(true);
+          setTimeout(() => setShowModal(true), 100);
         }
       });
 
@@ -44,7 +84,7 @@ function App() {
             formatting: newRow.formatting,
           });
           setLoading(false);
-          setShowModal(true);
+          setTimeout(() => setShowModal(true), 100);
         }
       )
       .subscribe();
@@ -54,7 +94,6 @@ function App() {
     };
   }, [uploadId]);
 
-  // Basic markdown to HTML (bold only)
   const renderWithMarkdown = (text) => {
     if (!text) return "";
     return text
@@ -67,23 +106,54 @@ function App() {
       style={{
         minHeight: "100vh",
         backgroundColor: "#f7f7f7",
-        padding: "2rem",
+        padding: "2rem 1rem",
         fontFamily: "'Segoe UI', Tahoma, Geneva, Verdana, sans-serif",
         display: "flex",
         flexDirection: "column",
         alignItems: "center",
-        position: "relative",
       }}
     >
-      <div style={{ maxWidth: "800px", textAlign: "center" }}>
-        <h4 style={{ textTransform: "uppercase", color: "#888", fontSize: "0.875rem" }}>
+      {loading && (
+        <div
+          style={{
+            position: "fixed",
+            top: 0,
+            left: 0,
+            width: "100vw",
+            height: "100vh",
+            backgroundColor: "rgba(255, 255, 255, 0.85)",
+            zIndex: 1000,
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            fontSize: "1.2rem",
+            fontWeight: "600",
+          }}
+        >
+          🔍 Processing roast… shanti rakhiye!
+        </div>
+      )}
+
+      <div style={{ maxWidth: "800px", width: "100%", textAlign: "center" }}>
+        <h4 style={{ textTransform: "uppercase", color: "#888", fontSize: "0.85rem" }}>
           Get ready to evaluate your resume
         </h4>
-        <h4 style={{ textTransform: "uppercase", color: "#888", fontSize: "0.675rem" }}>
+        <h4 style={{ textTransform: "uppercase", color: "#888", fontSize: "0.75rem" }}>
           This Is Gonna Hurt
         </h4>
-        <h1 style={{ fontSize: "3rem", fontWeight: "900", margin: "1rem 0" }}>
-          Upload. Roast. Improve. Repeat.
+        <h1
+          style={{
+            fontSize: "2rem",
+            fontWeight: "900",
+            margin: "1rem 0",
+            minHeight: "3rem",
+            wordWrap: "break-word",
+            transition: "all 0.3s ease",
+          }}
+        >
+          <span style={{ borderRight: typingFinished ? "none" : "2px solid black", paddingRight: "4px" }}>
+            {typedText}
+          </span>
         </h1>
         <p style={{ fontSize: "1rem", color: "#555", marginBottom: "2rem" }}>
           Pro tip: One upload away from brutal honesty.
@@ -96,22 +166,28 @@ function App() {
               borderRadius: "10px",
               padding: "2rem",
               backgroundColor: "#fff",
+              transition: "transform 0.3s",
+              cursor: "pointer",
             }}
+            onMouseEnter={(e) => (e.currentTarget.style.transform = "scale(1.02)")}
+            onMouseLeave={(e) => (e.currentTarget.style.transform = "scale(1)")}
           >
-            <UploadZone
-              onRoastComplete={(id) => {
-                setUploadId(id);
-              }}
-            />
+            <UploadZone onRoastComplete={(id) => setUploadId(id)} />
           </div>
         )}
-
-        {loading && (
-          <p style={{ marginTop: "2rem", fontWeight: "500", fontSize: "1.1rem" }}>
-            🔍 Processing roast… shanti rakhiye!
-          </p>
-        )}
       </div>
+
+      {/* Footer - Moved above the modal */}
+      <footer
+        style={{
+          marginTop: "17rem",
+          textAlign: "center",
+          color: "#777",
+          fontSize: "0.85rem",
+        }}
+      >
+        Developed by <strong>Ashwany</strong> • Took a lot of Sarcasm & Caffeine☕
+      </footer>
 
       {/* Roast Modal */}
       {showModal && roast && (
@@ -129,9 +205,7 @@ function App() {
             alignItems: "center",
             padding: "1rem",
           }}
-          onClick={() => {
-            setShowModal(false);
-          }}
+          onClick={() => setShowModal(false)}
         >
           <div
             onClick={(e) => e.stopPropagation()}
@@ -154,7 +228,6 @@ function App() {
               style={{ marginBottom: "1.5rem", lineHeight: "1.6" }}
               dangerouslySetInnerHTML={{ __html: renderWithMarkdown(roast.grammar) }}
             />
-
             <h2 style={{ fontSize: "1.8rem", fontWeight: "700", marginBottom: "1rem" }}>
               💥 Impact Igniter
             </h2>
@@ -162,7 +235,6 @@ function App() {
               style={{ marginBottom: "1.5rem", lineHeight: "1.6" }}
               dangerouslySetInnerHTML={{ __html: renderWithMarkdown(roast.impact) }}
             />
-
             <h2 style={{ fontSize: "1.8rem", fontWeight: "700", marginBottom: "1rem" }}>
               🧾 Formatting Finesse
             </h2>
@@ -170,7 +242,6 @@ function App() {
               style={{ marginBottom: "2rem", lineHeight: "1.6" }}
               dangerouslySetInnerHTML={{ __html: renderWithMarkdown(roast.formatting) }}
             />
-
             <div style={{ display: "flex", justifyContent: "flex-end" }}>
               <button
                 onClick={() => {
@@ -186,7 +257,10 @@ function App() {
                   borderRadius: "6px",
                   fontWeight: "600",
                   cursor: "pointer",
+                  transition: "transform 0.3s",
                 }}
+                onMouseEnter={(e) => (e.currentTarget.style.transform = "scale(1.05)")}
+                onMouseLeave={(e) => (e.currentTarget.style.transform = "scale(1)")}
               >
                 Roast Another Resume
               </button>
@@ -194,19 +268,6 @@ function App() {
           </div>
         </div>
       )}
-
-      {/* Footer */}
-      <footer
-        style={{
-          marginTop: "auto",
-          textAlign: "center",
-          color: "#777",
-          fontSize: "0.85rem",
-          paddingTop: "4rem",
-        }}
-      >
-        Developed by <strong>Ashwany</strong> 
-      </footer>
     </div>
   );
 }
