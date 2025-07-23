@@ -154,8 +154,8 @@ function App() {
       <div
         style={{
           position: "fixed",
-          top: 16,
-          right: 16,
+          top: 14,
+          right: 14,
           zIndex: 1000,
         }}
       >
@@ -165,7 +165,7 @@ function App() {
             backgroundColor: isDarkMode ? "#2c2c2c" : "#e0e0e0",
             color: isDarkMode ? "#fff" : "#000",
             border: "none",
-            padding: "0.5rem 0.9rem",
+            padding: "0.7rem 0.7rem",
             fontSize: window.innerWidth < 500 ? "1.2rem" : "1rem",
             borderRadius: "9999px",
             fontWeight: 600,
