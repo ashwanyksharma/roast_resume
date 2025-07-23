@@ -253,11 +253,8 @@ function App() {
           fontSize: "0.85rem",
         }}
       >
-<<<<<<< HEAD
-        Developed by <strong>Ashwany</strong> • Took a lot of Sarcasm, Caffeine & Coffee ☕
-=======
         Developed by <strong>Ashwany Kumar Sharma</strong> • Took a lot of Sarcasm & Caffeine☕
->>>>>>> 54efd6cd530605c771befeb053a0b1cbdd4870e5
+
       </footer>
 
       {showModal && roast && (
