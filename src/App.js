@@ -9,6 +9,7 @@ function App() {
   const [showModal, setShowModal] = useState(false);
   const [typedText, setTypedText] = useState("");
   const [typingFinished, setTypingFinished] = useState(false);
+  const [isDarkMode, setIsDarkMode] = useState(false);
 
   const words = ["Upload.", "Roast.", "Improve.", "Repeat."];
   const wordIndex = useRef(0);
@@ -101,18 +102,77 @@ function App() {
       .replace(/\n/g, "<br/>");
   };
 
+  const bgColor = isDarkMode ? "#121212" : "#f7f7f7";
+  const textColor = isDarkMode ? "#f5f5f5" : "#111";
+  const secondaryColor = isDarkMode ? "#aaa" : "#555";
+  const cardBg = isDarkMode ? "#1e1e1e" : "#fff";
+  const modalBg = isDarkMode ? "#1b1f29" : "#f0f6ff";
+  const borderColor = isDarkMode ? "#3399ff" : "navy";
+
   return (
     <div
       style={{
         minHeight: "100vh",
-        backgroundColor: "#f7f7f7",
+        backgroundColor: bgColor,
+        color: textColor,
         padding: "2rem 1rem",
         fontFamily: "'Segoe UI', Tahoma, Geneva, Verdana, sans-serif",
         display: "flex",
         flexDirection: "column",
         alignItems: "center",
+        transition: "all 0.3s ease-in-out",
       }}
     >
+      {/* Inject global styles to fix input white border */}
+      <style>
+        {`
+
+          * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+          input[type="file"] {
+            border: none !important;
+            outline: none !important;
+            background: transparent;
+            color: inherit;
+          }
+
+          input[type="file"]::file-selector-button {
+            background: ${isDarkMode ? "#333" : "#eee"};
+            color: ${isDarkMode ? "#fff" : "#000"};
+            border: none;
+            padding: 6px 12px;
+            border-radius: 4px;
+            cursor: pointer;
+          }
+
+          input[type="file"]::file-selector-button:focus {
+            outline: none;
+          }
+        `}
+      </style>
+
+      {/* Toggle Dark Mode Button */}
+      <div style={{ position: "absolute", top: 20, right: 20 }}>
+        <button
+          onClick={() => setIsDarkMode((prev) => !prev)}
+          style={{
+            background: "transparent",
+            border: `2px solid ${isDarkMode ? "#888" : "#000"}`,
+            color: isDarkMode ? "#f5f5f5" : "#000",
+            padding: "0.4rem 0.8rem",
+            borderRadius: "8px",
+            cursor: "pointer",
+            fontWeight: 600,
+            fontSize: "1rem",
+          }}
+        >
+          {window.innerWidth < 600 ? (isDarkMode ? "☀️" : "🌙") : isDarkMode ? "☀️ Light" : "🌙 Dark"}
+        </button>
+      </div>
+
       {loading && (
         <div
           style={{
@@ -121,13 +181,14 @@ function App() {
             left: 0,
             width: "100vw",
             height: "100vh",
-            backgroundColor: "rgba(255, 255, 255, 0.85)",
+            backgroundColor: isDarkMode ? "rgba(18,18,18,0.85)" : "rgba(255,255,255,0.85)",
             zIndex: 1000,
             display: "flex",
             alignItems: "center",
             justifyContent: "center",
             fontSize: "1.2rem",
             fontWeight: "600",
+            color: textColor,
           }}
         >
           🔍 Processing roast… shanti rakhiye!
@@ -135,10 +196,17 @@ function App() {
       )}
 
       <div style={{ maxWidth: "800px", width: "100%", textAlign: "center" }}>
-        <h4 style={{ textTransform: "uppercase", color: "#888", fontSize: "0.85rem" }}>
+        <h4 style={{ textTransform: "uppercase", color: "#000080", fontSize: "0.85rem" }}>
           Get ready to evaluate your resume
         </h4>
-        <h4 style={{ textTransform: "uppercase", color: "#888", fontSize: "0.75rem" }}>
+        <h4
+          style={{
+            textTransform: "uppercase",
+            color: isDarkMode ? "#bbb" : "#888",
+            fontSize: "0.75rem",
+            textDecoration: "underline",
+          }}
+        >
           This Is Gonna Hurt
         </h4>
         <h1
@@ -151,21 +219,21 @@ function App() {
             transition: "all 0.3s ease",
           }}
         >
-          <span style={{ borderRight: typingFinished ? "none" : "2px solid black", paddingRight: "4px" }}>
+          <span style={{ borderRight: typingFinished ? "none" : `2px solid ${textColor}`, paddingRight: "4px" }}>
             {typedText}
           </span>
         </h1>
-        <p style={{ fontSize: "1rem", color: "#555", marginBottom: "2rem" }}>
+        <p style={{ fontSize: "1rem", color: secondaryColor, marginBottom: "2rem" }}>
           Pro tip: One upload away from brutal honesty.
         </p>
 
         {!uploadId && (
           <div
             style={{
-              border: "2px dashed #ccc",
+              border: `2px dashed ${borderColor}`,
               borderRadius: "10px",
               padding: "2rem",
-              backgroundColor: "#fff",
+              backgroundColor: cardBg,
               transition: "transform 0.3s",
               cursor: "pointer",
             }}
@@ -177,19 +245,17 @@ function App() {
         )}
       </div>
 
-      {/* Footer - Moved above the modal */}
       <footer
         style={{
-          marginTop: "17rem",
+          marginTop: "18rem",
           textAlign: "center",
-          color: "#777",
+          color: secondaryColor,
           fontSize: "0.85rem",
         }}
       >
-        Developed by <strong>Ashwany</strong> • Took a lot of Sarcasm & Caffeine☕
+        Developed by <strong>Ashwany</strong> • Took a lot of Sarcasm, Caffeine & Coffee ☕
       </footer>
 
-      {/* Roast Modal */}
       {showModal && roast && (
         <div
           style={{
@@ -210,8 +276,8 @@ function App() {
           <div
             onClick={(e) => e.stopPropagation()}
             style={{
-              backgroundColor: "#fff",
-              color: "#111",
+              backgroundColor: modalBg,
+              color: textColor,
               padding: "2rem",
               borderRadius: "12px",
               maxWidth: "800px",
@@ -219,25 +285,21 @@ function App() {
               maxHeight: "90vh",
               overflowY: "auto",
               boxShadow: "0 10px 25px rgba(0,0,0,0.2)",
+              border: `3px solid ${borderColor}`,
+              transition: "all 0.3s ease-in-out",
             }}
           >
-            <h2 style={{ fontSize: "1.8rem", fontWeight: "700", marginBottom: "1rem" }}>
-              🧠 Grammar Gauntlet
-            </h2>
+            <h2 style={{ fontSize: "1.8rem", fontWeight: "700", marginBottom: "1rem" }}>🧠 Grammar Gauntlet</h2>
             <p
               style={{ marginBottom: "1.5rem", lineHeight: "1.6" }}
               dangerouslySetInnerHTML={{ __html: renderWithMarkdown(roast.grammar) }}
             />
-            <h2 style={{ fontSize: "1.8rem", fontWeight: "700", marginBottom: "1rem" }}>
-              💥 Impact Igniter
-            </h2>
+            <h2 style={{ fontSize: "1.8rem", fontWeight: "700", marginBottom: "1rem" }}>💥 Impact Igniter</h2>
             <p
               style={{ marginBottom: "1.5rem", lineHeight: "1.6" }}
               dangerouslySetInnerHTML={{ __html: renderWithMarkdown(roast.impact) }}
             />
-            <h2 style={{ fontSize: "1.8rem", fontWeight: "700", marginBottom: "1rem" }}>
-              🧾 Formatting Finesse
-            </h2>
+            <h2 style={{ fontSize: "1.8rem", fontWeight: "700", marginBottom: "1rem" }}>🧾 Formatting Finesse</h2>
             <p
               style={{ marginBottom: "2rem", lineHeight: "1.6" }}
               dangerouslySetInnerHTML={{ __html: renderWithMarkdown(roast.formatting) }}
@@ -250,8 +312,8 @@ function App() {
                   setShowModal(false);
                 }}
                 style={{
-                  backgroundColor: "#111",
-                  color: "#fff",
+                  backgroundColor: isDarkMode ? "#fff" : "#111",
+                  color: isDarkMode ? "#000" : "#fff",
                   padding: "0.75rem 1.5rem",
                   border: "none",
                   borderRadius: "6px",
