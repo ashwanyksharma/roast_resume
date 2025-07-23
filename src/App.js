@@ -123,22 +123,19 @@ function App() {
         transition: "all 0.3s ease-in-out",
       }}
     >
-      {/* Inject global styles to fix input white border */}
       <style>
         {`
-
           * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-    }
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+          }
           input[type="file"] {
             border: none !important;
             outline: none !important;
             background: transparent;
             color: inherit;
           }
-
           input[type="file"]::file-selector-button {
             background: ${isDarkMode ? "#333" : "#eee"};
             color: ${isDarkMode ? "#fff" : "#000"};
@@ -147,29 +144,42 @@ function App() {
             border-radius: 4px;
             cursor: pointer;
           }
-
           input[type="file"]::file-selector-button:focus {
             outline: none;
           }
         `}
       </style>
 
-      {/* Toggle Dark Mode Button */}
-      <div style={{ position: "absolute", top: 20, right: 20 }}>
+      {/* Dark Mode Toggle */}
+      <div
+        style={{
+          position: "fixed",
+          top: 16,
+          right: 16,
+          zIndex: 1000,
+        }}
+      >
         <button
           onClick={() => setIsDarkMode((prev) => !prev)}
           style={{
-            background: "transparent",
-            border: `2px solid ${isDarkMode ? "#888" : "#000"}`,
-            color: isDarkMode ? "#f5f5f5" : "#000",
-            padding: "0.4rem 0.8rem",
-            borderRadius: "8px",
-            cursor: "pointer",
+            backgroundColor: isDarkMode ? "#2c2c2c" : "#e0e0e0",
+            color: isDarkMode ? "#fff" : "#000",
+            border: "none",
+            padding: "0.5rem 0.9rem",
+            fontSize: window.innerWidth < 500 ? "1.2rem" : "1rem",
+            borderRadius: "9999px",
             fontWeight: 600,
-            fontSize: "1rem",
+            boxShadow: "0 2px 5px rgba(0,0,0,0.2)",
+            cursor: "pointer",
+            display: "flex",
+            alignItems: "center",
+            gap: "0.5rem",
           }}
         >
-          {window.innerWidth < 600 ? (isDarkMode ? "☀️" : "🌙") : isDarkMode ? "☀️ Light" : "🌙 Dark"}
+          {isDarkMode ? "☀️" : "🌙"}
+          <span style={{ display: window.innerWidth < 500 ? "none" : "inline" }}>
+            {isDarkMode ? "Light" : "Dark"}
+          </span>
         </button>
       </div>
 
@@ -254,7 +264,6 @@ function App() {
         }}
       >
         Developed by <strong>Ashwany Kumar Sharma</strong> • Took a lot of Sarcasm & Caffeine☕
-
       </footer>
 
       {showModal && roast && (
